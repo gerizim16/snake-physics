@@ -3,7 +3,7 @@ function snake(sketch) {
         darkGreen: [38, 70, 83],
         yellow: [233, 196, 106],
         orange: [244, 162, 97],
-        red: [231, 111, 111],
+        red: [210, 111, 111],
         bluegreen: [42, 157, 143],
         white: [220, 220, 220],
     }
@@ -23,7 +23,7 @@ function snake(sketch) {
         sketch.loop();
         dead = false;
         score = 0;
-        snake = new Snake(300, 300, 30, 10, 20, sketch, [...colors.white, 200]);
+        snake = new Snake(300, 300, 30, 10, 20, sketch, [...colors.white, 220]);
         snake.setVel(200, 200);
         food = createFood();
     }
