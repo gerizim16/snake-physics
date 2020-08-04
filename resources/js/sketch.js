@@ -63,12 +63,12 @@ function snake(sketch) {
             snake.rotate(0.1);
         }
 
+        snake.bound();
+        snake.update();
+
         if (snake.collidesSelf()) {
             dead = true;
         }
-
-        snake.bound();
-        snake.update();
 
         sketch.background(colors.red);
 
