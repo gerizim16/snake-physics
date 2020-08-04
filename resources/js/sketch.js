@@ -12,20 +12,40 @@ function snake(sketch) {
         white: 220,
     }
 
+    let snake;
+
     sketch.preload = function () {
     };
 
     sketch.setup = function () {
         let canvas = sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
         canvas.style('display', 'block');
-        sketch.frameRate(30);
+        // sketch.frameRate(30);
+        snake = new Snake(100, 100, 30, 50, sketch, 10, [0, 100]);
+        snake.setVel(300, 0);
     };
 
     sketch.draw = function () {
+        if (sketch.keyIsDown(sketch.LEFT_ARROW)) {
+            snake.accel.p = -3000;
+        } else if (sketch.keyIsDown(sketch.RIGHT_ARROW)) {
+            snake.accel.p = 3000;
+        } else {
+            snake.accel.p = 0;
+        }
+        snake.bound();
+        snake.update();
+
+        sketch.background(255);
+
+        snake.draw();
+    };
+
+    sketch.mouseMoved = function () {
     };
 
     sketch.mouseClicked = function () {
-    }
+    };
 
     sketch.keyPressed = function () {
     };
@@ -35,8 +55,7 @@ function snake(sketch) {
 
     sketch.windowResized = function () {
         sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
-        reset();
-    }
+    };
 }
 
 let p5Sketch = new p5(snake, 'gameContainer');
