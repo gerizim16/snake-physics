@@ -22,16 +22,19 @@ function snake(sketch) {
         canvas.style('display', 'block');
         // sketch.frameRate(30);
         snake = new Snake(100, 100, 30, 50, sketch, 10, [0, 100]);
-        snake.setVel(300, 0);
+        snake.setVel(200, 200);
     };
 
     sketch.draw = function () {
-        if (sketch.keyIsDown(sketch.LEFT_ARROW)) {
-            snake.accel.p = -3000;
-        } else if (sketch.keyIsDown(sketch.RIGHT_ARROW)) {
-            snake.accel.p = 3000;
-        } else {
-            snake.accel.p = 0;
+        if (!sketch.focused) {
+            sketch.deltaTIme = 0;
+            return;
+        }
+        if (sketch.keyIsDown(sketch.LEFT_ARROW) || (sketch.mouseIsPressed && sketch.mouseX < sketch.width / 2)) {
+            snake.rotate(-0.2);
+        }
+        if (sketch.keyIsDown(sketch.RIGHT_ARROW) || (sketch.mouseIsPressed && sketch.mouseX > sketch.width / 2)) {
+            snake.rotate(0.2);
         }
         snake.bound();
         snake.update();

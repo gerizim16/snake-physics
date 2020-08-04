@@ -24,7 +24,6 @@ class Snake {
     constructor(x, y, segmentLength = 20, nSegments = 10, sketch, thickness = 10, color = [0, 100]) {
         this.position = sketch.createVector(x, y);
         this.velocity = sketch.createVector(0, 0);
-        this.accel = { p: 0, t: 0, };
         this.sketch = sketch;
         this.thickness = thickness;
         this.color = color;
@@ -51,21 +50,8 @@ class Snake {
         this.velocity.set(x, y);
     }
 
-    updateVel() {
-        if (this.accel.p != 0) {
-            const tempVec = this.velocity.copy();
-            tempVec.rotate(this.sketch.HALF_PI);
-            tempVec.setMag(this.accel.p * this.sketch.deltaTime / 1000);
-            const pastMag = this.velocity.mag();
-            this.velocity.add(tempVec);
-            this.velocity.setMag(pastMag);
-        }
-        this.velocity.setMag(this.velocity.mag() + this.accel.t * this.sketch.deltaTime / 1000);
-    }
-
-    setAcc(perpendicular, tangential) {
-        if (perpendicular != null) this.accel.p = perpendicular;
-        if (tangential != null) this.accel.t = tangential;
+    rotate(rad) {
+        this.velocity.rotate(rad);
     }
 
     bound() {
@@ -76,7 +62,6 @@ class Snake {
     }
 
     update() {
-        this.updateVel();
         this.updatePos();
         this._updateSegments();
     }
