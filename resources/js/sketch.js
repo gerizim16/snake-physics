@@ -1,18 +1,37 @@
-function dist(ax, ay, bx, by) {
-    return Math.hypot(ax - bx, ay - by);
-}
-
 function snake(sketch) {
     const colors = {
         darkGreen: [38, 70, 83],
         yellow: [233, 196, 106],
         orange: [244, 162, 97],
-        red: [231, 111, 81],
+        red: [231, 111, 111],
         bluegreen: [42, 157, 143],
-        white: 220,
+        white: [220, 220, 220],
+    }
+
+    function createFood(radius = 20) {
+        const padding = radius + 10;
+        return new Food(
+            getRandomInt(padding, sketch.width - padding),
+            getRandomInt(padding, sketch.height - padding),
+            radius,
+            sketch,
+            colors.darkGreen,
+        );
+    }
+
+    function reset() {
+        sketch.loop();
+        dead = false;
+        score = 0;
+        snake = new Snake(300, 300, 30, 10, 20, sketch, [...colors.white, 200]);
+        snake.setVel(200, 200);
+        food = createFood();
     }
 
     let snake;
+    let food;
+    let score;
+    let dead;
 
     sketch.preload = function () {
     };
@@ -21,39 +40,67 @@ function snake(sketch) {
         let canvas = sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
         canvas.style('display', 'block');
         // sketch.frameRate(30);
-        snake = new Snake(100, 100, 30, 50, sketch, 10, [0, 100]);
-        snake.setVel(200, 200);
+
+        reset();
     };
 
     sketch.draw = function () {
-        if (!sketch.focused) {
+        if (dead || !sketch.focused) {
             sketch.deltaTIme = 0;
             return;
         }
+
+        if (food.collides(snake.position, snake.radius)) {
+            score++;
+            snake.addSegment();
+            food = createFood();
+        }
+
         if (sketch.keyIsDown(sketch.LEFT_ARROW) || (sketch.mouseIsPressed && sketch.mouseX < sketch.width / 2)) {
-            snake.rotate(-0.2);
+            snake.rotate(-0.1);
         }
         if (sketch.keyIsDown(sketch.RIGHT_ARROW) || (sketch.mouseIsPressed && sketch.mouseX > sketch.width / 2)) {
-            snake.rotate(0.2);
+            snake.rotate(0.1);
         }
+
+        if (snake.collidesSelf()) {
+            dead = true;
+        }
+
         snake.bound();
         snake.update();
 
-        sketch.background(255);
+        sketch.background(colors.red);
+
+        sketch.textSize(sketch.height * 0.5);
+        sketch.textAlign(sketch.CENTER, sketch.CENTER);
+        sketch.text(score, sketch.width / 2, sketch.height / 2);
 
         snake.draw();
+        food.draw();
+
+        if (dead) {
+            sketch.textSize(sketch.height * 0.05);
+            sketch.text('tap anywhere or press r\nto restart', sketch.width / 2, sketch.height / 4 * 3);
+        }
     };
 
     sketch.mouseMoved = function () {
     };
 
     sketch.mouseClicked = function () {
+        if (dead) {
+            reset();
+        }
     };
 
     sketch.keyPressed = function () {
     };
 
     sketch.keyReleased = function () {
+        if (dead && sketch.keyCode === 82) {
+            reset();
+        }
     };
 
     sketch.windowResized = function () {

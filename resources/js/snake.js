@@ -1,40 +1,65 @@
 class Segment {
-    constructor(x, y, length, sketch) {
-        this.x = x;
-        this.y = y;
+    constructor(x, y, length, radius, sketch) {
+        this.position = sketch.createVector(x, y);
         this.length = length;
+        this.radius = radius;
         this.sketch = sketch;
         this.angle = 0;
     }
 
+    get tail() {
+        return createVector()
+    }
+
     drag(x, y) {
-        const dx = x - this.x;
-        const dy = y - this.y;
+        const dx = x - this.position.x;
+        const dy = y - this.position.y;
         this.angle = Math.atan2(dy, dx);
-        this.x = x - Math.cos(this.angle) * this.length;
-        this.y = y - Math.sin(this.angle) * this.length;
+        this.position.x = x - Math.cos(this.angle) * this.length;
+        this.position.y = y - Math.sin(this.angle) * this.length;
     }
 
     draw() {
-        this.sketch.line(this.x, this.y, this.x + this.length * Math.cos(this.angle), this.y + this.length * Math.sin(this.angle));
+        this.sketch.line(this.position.x, this.position.y, this.position.x + this.length * Math.cos(this.angle), this.position.y + this.length * Math.sin(this.angle));
+    }
+
+    collides(vec, radius = 0) {
+        return this.position.dist(vec) < this.radius + radius;
     }
 }
 
 class Snake {
-    constructor(x, y, segmentLength = 20, nSegments = 10, sketch, thickness = 10, color = [0, 100]) {
+    constructor(x, y, segmentLength = 20, nSegments = 10, thickness = 10, sketch, color = [0, 100]) {
         this.position = sketch.createVector(x, y);
         this.velocity = sketch.createVector(0, 0);
         this.sketch = sketch;
         this.thickness = thickness;
+        this.radius = thickness / 2;
         this.color = color;
 
         nSegments = Math.max(1, nSegments);
         this.segments = new Array(nSegments);
         this.segLength = segmentLength;
-        this.segments[0] = new Segment(this.position.x, this.position.y, this.segLength, this.sketch);
+        this.segments[0] = new Segment(0, 0, this.segLength, this.radius, this.sketch);
         for (let i = 1; i < this.segments.length; i++) {
-            this.segments[i] = new Segment(this.segments[i - 1].x, this.segments[i - 1].y, this.segLength, this.sketch);
+            this.segments[i] = new Segment(0, 0, this.segLength, this.radius, this.sketch);
         }
+    }
+
+    addSegments(n) {
+        for (let i = 0; i < n; i++) {
+            this.addSegment();
+        }
+    }
+
+    addSegment() {
+        const tail = this.segments[this.segments.length - 1];
+        const tempVec = p5.Vector.add(tail.position, this.velocity);
+        this.segments.push(new Segment(tempVec.x, tempVec.y, this.segLength, this.radius, this.sketch));
+    }
+
+    subSegment() {
+        this.segments.pop();
     }
 
     setPos(x, y) {
@@ -61,6 +86,13 @@ class Snake {
         if (this.position.y >= this.sketch.height && this.velocity.y > 0) this.velocity.y = -Math.abs(this.velocity.y);
     }
 
+    collidesSelf() {
+        for (const segment of this.segments) {
+            if (segment.collides(this.position, this.radius)) return true;
+        }
+        return false;
+    }
+
     update() {
         this.updatePos();
         this._updateSegments();
@@ -68,6 +100,7 @@ class Snake {
 
     draw() {
         this.sketch.push();
+        this.sketch.strokeWeight(0);
         this.sketch.strokeWeight(this.thickness);
         this.sketch.stroke(this.color);
         for (const segment of this.segments) {
@@ -79,8 +112,7 @@ class Snake {
     _updateSegments() {
         this.segments[0].drag(this.position.x, this.position.y);
         for (let i = 1; i < this.segments.length; i++) {
-            this.segments[i].drag(this.segments[i - 1].x, this.segments[i - 1].y);
-
+            this.segments[i].drag(this.segments[i - 1].position.x, this.segments[i - 1].position.y);
         }
     }
 }
