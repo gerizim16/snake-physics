@@ -3,7 +3,7 @@ function snake(sketch) {
         darkGreen: [38, 70, 83],
         yellow: [233, 196, 106],
         orange: [244, 162, 97],
-        red: [210, 111, 111],
+        red: [220, 140, 140],
         bluegreen: [42, 157, 143],
         white: [220, 220, 220],
     }
@@ -72,7 +72,7 @@ function snake(sketch) {
 
         sketch.background(colors.red);
 
-        sketch.textSize(sketch.height * 0.5);
+        sketch.textSize(sketch.height * 0.4);
         sketch.textAlign(sketch.CENTER, sketch.CENTER);
         sketch.text(score, sketch.width / 2, sketch.height / 2);
 
@@ -80,7 +80,7 @@ function snake(sketch) {
         food.draw();
 
         if (dead) {
-            sketch.textSize(sketch.height * 0.05);
+            sketch.textSize(sketch.height * 0.03);
             sketch.text('tap anywhere or press r\nto restart', sketch.width / 2, sketch.height / 4 * 3);
         }
     };
